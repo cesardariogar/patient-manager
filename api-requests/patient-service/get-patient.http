@@ -1,0 +1,3 @@
+### GET request by Patient name
+GET www.localhost:4000/patient/Test
+###
