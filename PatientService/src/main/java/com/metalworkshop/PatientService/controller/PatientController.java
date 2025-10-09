@@ -1,63 +1,1 @@
-package com.metalworkshop.PatientService.controller;
-
-import com.metalworkshop.PatientService.dto.PatientRequestDto;
-import com.metalworkshop.PatientService.dto.PatientResponseDto;
-import com.metalworkshop.PatientService.dto.validators.UpdatePatientValidationGroup;
-import com.metalworkshop.PatientService.repository.PatientRepository;
-import com.metalworkshop.PatientService.service.PatientService;
-import jakarta.validation.groups.Default;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
-
-@RestController
-@RequestMapping("/patients")
-public class PatientController {
-
-    private final PatientService patientService;
-
-    @Autowired
-    public PatientController(PatientService patientService,
-                             PatientRepository patientRepository) {
-        this.patientService = patientService;
-    }
-
-    @GetMapping()
-    public ResponseEntity<List<PatientResponseDto>> findAll() {
-
-        return ResponseEntity.ok().body(patientService.findAll());
-    }
-
-    @GetMapping("/{name}")
-    public ResponseEntity<PatientResponseDto> findByName(@PathVariable("name") String name) {
-
-        return ResponseEntity.of(patientService.findByName(name));
-    }
-
-    @PostMapping
-    public ResponseEntity<PatientResponseDto> createPatient(
-            @Validated(Default.class) @RequestBody PatientRequestDto requestDto) {
-
-        return ResponseEntity.ok().body(patientService.createPatient(requestDto));
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<PatientResponseDto> updatePatient(
-            @PathVariable("id") UUID id,
-            @Validated(UpdatePatientValidationGroup.class) @RequestBody PatientRequestDto requestDto) {
-        PatientResponseDto patientResponseDto = patientService.updatePatient(id, requestDto);
-
-        return ResponseEntity.ok().body(patientResponseDto);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deletePatientById(@PathVariable("id") UUID id) {
-        patientService.deleteByUUID(id);
-
-        return ResponseEntity.ok().build();
-    }
-}
+package com.metalworkshop.PatientService.controller;import com.metalworkshop.PatientService.dto.PatientRequestDto;import com.metalworkshop.PatientService.dto.PatientResponseDto;import com.metalworkshop.PatientService.dto.validators.UpdatePatientValidationGroup;import com.metalworkshop.PatientService.repository.PatientRepository;import com.metalworkshop.PatientService.service.PatientService;import io.swagger.v3.oas.annotations.Operation;import io.swagger.v3.oas.annotations.tags.Tag;import jakarta.validation.groups.Default;import org.springframework.beans.factory.annotation.Autowired;import org.springframework.http.ResponseEntity;import org.springframework.validation.annotation.Validated;import org.springframework.web.bind.annotation.*;import java.util.List;import java.util.Optional;import java.util.UUID;@RestController@RequestMapping("/patients")@Tag(name = "Patient", description = "API for managing Patients")public class PatientController {    private final PatientService patientService;    @Autowired    public PatientController(PatientService patientService,                             PatientRepository patientRepository) {        this.patientService = patientService;    }    @GetMapping    @Operation(summary = "Get Patients")    public ResponseEntity<List<PatientResponseDto>> findAll() {        List<PatientResponseDto> patients = patientService.findAll();        return ResponseEntity.ok().body(patients);    }    @GetMapping("/{name}")    @Operation(summary = "Get Patient by name")    public ResponseEntity<PatientResponseDto> findByName(@PathVariable("name") String name) {        Optional<PatientResponseDto> patientFound = patientService.findByName(name);        return ResponseEntity.of(patientFound);    }    @PostMapping    @Operation(summary = "Create a new Patient")    public ResponseEntity<PatientResponseDto> createPatient(            @Validated(Default.class) @RequestBody PatientRequestDto requestDto) {        PatientResponseDto newPatient = patientService.createPatient(requestDto);        return ResponseEntity.ok().body(newPatient);    }    @PutMapping("/{id}")    @Operation(summary = "Update a Patient")    public ResponseEntity<PatientResponseDto> updatePatient(            @PathVariable("id") UUID id,            @Validated(UpdatePatientValidationGroup.class) @RequestBody PatientRequestDto requestDto) {        PatientResponseDto patientResponseDto = patientService.updatePatient(id, requestDto);        return ResponseEntity.ok().body(patientResponseDto);    }    @DeleteMapping("/{id}")    @Operation(summary = "Delete a new Patient")    public ResponseEntity<Void> deletePatientById(@PathVariable("id") UUID id) {        patientService.deleteByUUID(id);        return ResponseEntity.noContent().build();    }}
