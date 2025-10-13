@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.metalworkshop</groupId>
-    <artifactId>patient-billing</artifactId>
+    <artifactId>billing-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>patientBilling</name>
+    <name>BillingService</name>
     <description>Billing service for the Patient Manager</description>
     <url/>
     <licenses>
