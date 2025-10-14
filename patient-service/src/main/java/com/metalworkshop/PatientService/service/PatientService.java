@@ -4,6 +4,7 @@ import com.metalworkshop.PatientService.dto.PatientRequestDto;
 import com.metalworkshop.PatientService.dto.PatientResponseDto;
 import com.metalworkshop.PatientService.exceptions.EmailAlreadyExistsException;
 import com.metalworkshop.PatientService.exceptions.PatientNotFoundException;
+import com.metalworkshop.PatientService.grpc.BillingServiceGrpcClient;
 import com.metalworkshop.PatientService.mappers.PatientMapper;
 import com.metalworkshop.PatientService.model.Patient;
 import com.metalworkshop.PatientService.repository.PatientRepository;
@@ -24,11 +25,14 @@ public class PatientService {
 
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository patientRepository;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
     @Autowired
     public PatientService(PatientRepository patientRepository,
-                          PatientMapper patientMapper) {
+                          PatientMapper patientMapper,
+                          BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public Optional<PatientResponseDto> findByName(String name) {
@@ -54,6 +58,12 @@ public class PatientService {
         Patient newPatient = PatientMapper.toEntity(patientDto);
         newPatient.setRegisterDate(LocalDate.now());
         Patient patient = patientRepository.save(newPatient);
+
+        billingServiceGrpcClient.createBillingAccount(
+                newPatient.getId().toString(),
+                newPatient.getName(),
+                newPatient.getEmail()
+        );
 
         return PatientMapper.toDto(patient);
     }

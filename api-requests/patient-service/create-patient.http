@@ -11,4 +11,10 @@ Content-Type: application/json
 }
 ###
 
-
+### httpie
+http POST localhost:4000/patients \
+"name"="menesio" \
+"lastName"="rio" \
+"email"="menesio.rio@example.com"  \
+"address"="poraqui y por alla" \
+"dateOfBirth"="1977-03-09"
