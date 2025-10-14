@@ -1,0 +1,11 @@
+GRPC localhost:9001/BillingService/CreateBillingAccount
+{
+    "patientId" : "1234",
+    "name" : "John Doe",
+    "email" : "john.doe@example.com"
+}
+
+
+grpcurl -plaintext -d  \
+'{ "patientId" : "1234","name" : "John Doe", "email" : "john.doe@example.com" }' \
+localhost:9001 BillingService/CreateBillingAccount
