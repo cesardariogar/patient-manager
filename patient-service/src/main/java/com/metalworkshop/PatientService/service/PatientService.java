@@ -5,6 +5,7 @@ import com.metalworkshop.PatientService.dto.PatientResponseDto;
 import com.metalworkshop.PatientService.exceptions.EmailAlreadyExistsException;
 import com.metalworkshop.PatientService.exceptions.PatientNotFoundException;
 import com.metalworkshop.PatientService.grpc.BillingServiceGrpcClient;
+import com.metalworkshop.PatientService.kafka.KafkaProducer;
 import com.metalworkshop.PatientService.mappers.PatientMapper;
 import com.metalworkshop.PatientService.model.Patient;
 import com.metalworkshop.PatientService.repository.PatientRepository;
@@ -26,13 +27,16 @@ public class PatientService {
     private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository patientRepository;
     private final BillingServiceGrpcClient billingServiceGrpcClient;
+    private final KafkaProducer kafkaProducer;
 
     @Autowired
     public PatientService(PatientRepository patientRepository,
                           PatientMapper patientMapper,
-                          BillingServiceGrpcClient billingServiceGrpcClient) {
+                          BillingServiceGrpcClient billingServiceGrpcClient,
+                          KafkaProducer kafkaProducer) {
         this.patientRepository = patientRepository;
         this.billingServiceGrpcClient = billingServiceGrpcClient;
+        this.kafkaProducer = kafkaProducer;
     }
 
     public Optional<PatientResponseDto> findByName(String name) {
@@ -59,11 +63,15 @@ public class PatientService {
         newPatient.setRegisterDate(LocalDate.now());
         Patient patient = patientRepository.save(newPatient);
 
+        // GRPC
         billingServiceGrpcClient.createBillingAccount(
                 newPatient.getId().toString(),
                 newPatient.getName(),
                 newPatient.getEmail()
         );
+
+        // Kafka
+        kafkaProducer.sendEvent(newPatient);
 
         return PatientMapper.toDto(patient);
     }
