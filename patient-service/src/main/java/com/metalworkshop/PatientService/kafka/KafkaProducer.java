@@ -10,7 +10,7 @@ import patient.events.PatientEvent;
 @Service
 public class KafkaProducer {
 
-    Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
 
     public KafkaProducer(KafkaTemplate<String, byte[]> kafkaTemplate) {
