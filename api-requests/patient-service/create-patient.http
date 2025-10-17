@@ -12,7 +12,7 @@ Content-Type: application/json
 ###
 
 ### httpie
-http POST localhost:4000/patients \
+http POST localhost:4000/api/patients \
 "name"="menesio" \
 "lastName"="rio" \
 "email"="menesio.rio@example.com"  \
