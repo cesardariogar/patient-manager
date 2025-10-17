@@ -17,7 +17,8 @@ public class BillingGrpcService extends BillingServiceImplBase {
     @Override
     public void createBillingAccount(BillingRequest request,
                                      StreamObserver<BillingResponse> responseObserver) {
-        logger.info("createBillingAccount request received: ", request.toString());
+        logger.info("createBillingAccount request received, request Patient id:{}, name:{}, email: {} ",
+                request.getPatientId(), request.getName(), request.getEmail());
 
         // Business logic - e.g. save to database, etc.
         BillingResponse response = billing.BillingResponse.newBuilder()

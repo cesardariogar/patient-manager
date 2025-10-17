@@ -2,10 +2,6 @@
 server:
   port: 4004  # Gateway listens on port 4004
 
-logging:
-  level:
-    root: DEBUG
-
 spring:
   output:
     ansi:
@@ -30,3 +26,4 @@ spring:
                 - Path=/api-docs/patients
               filters:
                 - RewritePath=/api-docs/patients,/v3/api-docs
+
