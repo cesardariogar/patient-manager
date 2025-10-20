@@ -1,20 +1,14 @@
 ### POST create a new Patient
-POST www.localhost:4000/patient
+POST http://localhost:4004/api/patients
 Content-Type: application/json
+
 {
-    "name" = "Daniel",
-    "lastName" = "Revoir",
-    "email" ="daniel.revos@example.com",
-    "address" = "025 gideon street",
-    "dateOfBirth" = "1977-03-09",
-    "registeredDate" = "2023-03-15"
+    "name" : "Testerino",
+    "lastName" : "Cappucino",
+    "email" : "testerino.cappucino@example.com",
+    "address" : "alegria siempre viva 124",
+    "dateOfBirth" : "1977-03-09"
 }
+
 ###
 
-### httpie
-http POST localhost:4000/api/patients \
-"name"="menesio" \
-"lastName"="rio" \
-"email"="menesio.rio@example.com"  \
-"address"="poraqui y por alla" \
-"dateOfBirth"="1977-03-09"

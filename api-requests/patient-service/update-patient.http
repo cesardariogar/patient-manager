@@ -1,14 +1,16 @@
 ### PUT updates an existing Patient by UUID
-PUT www.localhost:4000/patient/840165dd-a572-417f-be3a-3e1a406d62b6
+PUT http://localhost:4004/api/patients/b1a7e8c2-1234-4f56-9abc-1a2b3c4d5e6f
 Content-Type: application/json
+
 {
-    "id"="840165dd-a572-417f-be3a-3e1a406d62b6",
-    "name" = "Daniel",
-    "lastName" = "Revoir",
-    "email" ="daniel.revos@example.com",
-    "address" = "025 gideon street",
-    "dateOfBirth" = "1977-03-09",
+    "id" : "b1a7e8c2-1234-4f56-9abc-1a2b3c4d5e6f",
+    "name" : "John",
+    "lastName" : "Not Does",
+    "email" : "john.notdoes@example.com",
+    "address" : "updated john doe example",
+    "dateOfBirth" : "1977-03-09"
 }
+
 ###
 
 
