@@ -2,6 +2,7 @@ package com.metalworkshop.auth_service.service;
 
 import com.metalworkshop.auth_service.dto.LoginRequestDto;
 import com.metalworkshop.auth_service.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    @Autowired
     public AuthService(UserService userService,
                        PasswordEncoder passwordEncoder,
                        JwtUtil jwtUtil) {
