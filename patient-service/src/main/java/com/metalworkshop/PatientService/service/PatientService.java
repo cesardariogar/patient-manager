@@ -40,7 +40,7 @@ public class PatientService {
     }
 
     public Optional<PatientResponseDto> findByName(String name) {
-        Optional<Patient> patient = patientRepository.findByName(name);
+        Optional<Patient> patient = patientRepository.findByNameIgnoreCase(name);
 
         return patient.map(PatientMapper::toDto);
     }
