@@ -7,9 +7,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Optional;
 
@@ -27,16 +25,20 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto requestDto) {
+        Optional<String> token = authService.authenticate(requestDto);
 
-        System.out.println(">>>>>>>>>>>>>>>>> request: " + requestDto.toString());
-        Optional<String> tokenOptional = authService.authenticate(requestDto);
+        return token.map(s -> ResponseEntity.ok(new LoginResponseDto(s)))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).build());
 
-        if (tokenOptional.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    }
 
-        String token = tokenOptional.get();
-        System.out.println(">>>>>>>>>>>>>>>>> token: " + token);
-        return ResponseEntity.ok(new LoginResponseDto(token));
+    @Operation(summary = "Validate Token")
+    @GetMapping("/validate")
+    public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
+        boolean isValid = authService.validateJWTToken(authHeader);
+
+        return (isValid)
+                ? ResponseEntity.ok().build()
+                : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 }

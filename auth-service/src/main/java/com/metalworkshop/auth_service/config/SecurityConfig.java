@@ -15,10 +15,11 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+        return http
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()
+                )
                 .csrf(AbstractHttpConfigurer::disable)
-                //.sessionManagement(session ->
-                //       session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 

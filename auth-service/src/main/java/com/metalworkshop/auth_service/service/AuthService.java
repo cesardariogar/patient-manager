@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class AuthService {
 
@@ -29,10 +31,16 @@ public class AuthService {
         Optional<String> token = userService
                 .findByEmail(requestDto.getEmail())
                 .filter(u -> passwordEncoder.matches(requestDto.getPassword(), u.getPassword()))
-                .map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole()));
+                .map(u -> jwtUtil.generateJWTToken(u.getEmail(), u.getRole()));
 
         return token;
     }
 
+    public boolean validateJWTToken(String authHeader) {
+        if (isNull(authHeader) || !authHeader.startsWith("Bearer ")) {
+            return false;
+        }
 
+        return jwtUtil.validateJWTToken(authHeader.substring(7));
+    }
 }
