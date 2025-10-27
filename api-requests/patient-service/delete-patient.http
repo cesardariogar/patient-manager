@@ -1,3 +1,5 @@
 ### DELETE request by Patient UUID
-DELETE http://localhost:4004/api/patients/16da93e4-7de7-4aaf-9bd1-a5837f05a3e1
+DELETE http://localhost:4004/api/patients/61925a25-1235-482d-9fba-c372b647ef68
+Authorization: Bearer
+
 ###
