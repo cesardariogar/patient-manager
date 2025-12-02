@@ -17,7 +17,7 @@ FROM builder AS tester
 RUN mvn test
 
 # ===== Stage 3: Runtime =====
-FROM openjdk:21-jdk AS runner
+FROM eclipse-temurin:21 AS runner
 
 WORKDIR /app
 
