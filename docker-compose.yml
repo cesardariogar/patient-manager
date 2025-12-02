@@ -1,0 +1,204 @@
+services:
+
+  # patient-service-db
+  patient-service-db:
+    deploy:
+      resources:
+        limits:
+          cpus: "0.40"
+          memory: 500m
+    image: postgres:18
+    container_name: patient-service-db
+    environment:
+
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD
+      POSTGRES_DB: default_database
+    secrets:
+      - POSTGRES_PASSWORD
+      - DB_AUTH_PASSWORD
+      - DB_PATIENT_PASSWORD
+    volumes:
+      - ./docker/patient-service-db:/var/lib/postgresql/18/data
+      - ./docker/scripts/init-db:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+    networks:
+      - patient-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d default_database"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # auth-service
+  auth-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 350m
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    networks:
+      - patient-network
+    ports:
+      - "4005:4005"
+    environment:
+      APP_ENV: ${APP_ENV}
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/auth_database
+      SPRING_DATASOURCE_USERNAME: auth_admin
+      SPRING_DATASOURCE_PASSWORD: "tbd"
+      JWT_SECRET: "tbd"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_SQL_INIT_MODE: always
+    depends_on:
+      patient-service-db:
+        condition: service_healthy
+    volumes:
+      - ./.secrets/db_auth_password.txt:/run/secrets/DB_AUTH_PASSWORD:ro
+      - ./.secrets/jwt_secret.txt:/run/secrets/JWT_SECRET:ro
+
+  # api-gateway
+  api-gateway:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 350m
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    networks:
+      - patient-network
+    ports:
+      - "4004:4004"
+    environment:
+      APP_ENV: ${APP_ENV}
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
+      AUTH_SERVICE_URL: localhost:5001
+    depends_on:
+      - auth-service
+
+  # patient-service
+  patient-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 350m
+    build:
+      context: ./patient-service/
+      dockerfile: Dockerfile
+    container_name: patient-service
+    networks:
+      - patient-network
+    ports:
+      - "4000:4000"
+      - "5005:5005"
+    environment:
+      APP_ENV: ${APP_ENV}
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/patient_service
+      SPRING_DATASOURCE_USERNAME: patient_admin
+      SPRING_DATASOURCE_PASSWORD: "tbd"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 'kafka:9092'
+      SPRING_SQL_INIT_MODE: always
+    depends_on:
+      api-gateway:
+        condition: service_started
+      patient-service-db:
+        condition: service_healthy
+    volumes:
+      - ./.secrets/db_patient_password.txt:/run/secrets/DB_PATIENT_PASSWORD:ro
+
+  # billing-service
+  billing-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 350m
+    build:
+      context: ./billing-service
+      dockerfile: Dockerfile
+    container_name: billing-service
+    networks:
+      - patient-network
+    ports:
+      - "4001:4001"
+      - "9001:9001"
+    environment:
+      APP_ENV: ${APP_ENV}
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
+    depends_on:
+      - patient-service
+
+  # analytics-service
+  analytics-service:
+    deploy:
+      resources:
+        limits:
+          cpus: '0.30'
+          memory: 350m
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    container_name: analytics-service
+    networks:
+      - patient-network
+    ports:
+      - "4002:4002"
+    environment:
+      APP_ENV: ${APP_ENV}
+      JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
+    depends_on:
+      - api-gateway
+      - kafka-service
+
+  kafka-service:
+    image: apache/kafka:latest
+    container_name: kafka-service
+    deploy:
+      resources:
+        limits:
+          cpus: "0.60"
+          memory: 900m
+    ports:
+      - "9092:9092"
+      - "9094:9094"
+    environment:
+      KAFKA_HEAP_OPTS: -Xms512m -Xmx512m
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,EXTERNAL://localhost:9094
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,EXTERNAL:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,EXTERNAL://0.0.0.0:9094
+      KAFKA_NODE_ID: 1
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_PROCESS_ROLES: controller,broker
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qg==
+    networks:
+      - patient-network
+
+networks:
+  patient-network:
+
+secrets:
+  POSTGRES_PASSWORD:
+    file: .secrets/postgres_password.txt
+  DB_PATIENT_PASSWORD:
+    file: .secrets/db_patient_password.txt
+  DB_AUTH_PASSWORD:
+    file: .secrets/db_auth_password.txt
