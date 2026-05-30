@@ -2,12 +2,13 @@
 server:
   port: 4004  # Gateway listens on port 4004
 
+
 spring:
   output:
     ansi:
       enabled: always
   application:
-    name: PatientService
+    name: api-gateway
   cloud:
     gateway:
       server:
