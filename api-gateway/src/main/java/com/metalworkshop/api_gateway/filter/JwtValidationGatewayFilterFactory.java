@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class JwtValidationGatewayFilterFactory extends
         AbstractGatewayFilterFactory<Object> {
 
+
     private final WebClient webClient;
 
     public JwtValidationGatewayFilterFactory(WebClient.Builder webClientBuilder,
@@ -27,7 +28,6 @@ public class JwtValidationGatewayFilterFactory extends
 
             if (token == null || !token.startsWith("Bearer ")) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-
                 return exchange.getResponse().setComplete();
             }
 
@@ -36,7 +36,12 @@ public class JwtValidationGatewayFilterFactory extends
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .retrieve()
                     .toBodilessEntity()
-                    .then(chain.filter(exchange));
+                    .flatMap(response -> chain.filter(exchange))
+                    .onErrorResume(ex -> {
+                        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                        return exchange.getResponse().setComplete();
+                    });
+
         };
     }
 }
