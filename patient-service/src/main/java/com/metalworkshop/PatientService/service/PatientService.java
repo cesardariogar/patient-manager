@@ -12,6 +12,9 @@ import com.metalworkshop.PatientService.repository.PatientRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -19,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Objects.nonNull;
 import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
@@ -40,18 +44,34 @@ public class PatientService {
     }
 
     public Optional<PatientResponseDto> findByName(String name) {
-        Optional<Patient> patient = patientRepository.findByNameIgnoreCase(name);
-
-        return patient.map(PatientMapper::toDto);
+        return patientRepository.findByNameIgnoreCase(name)
+                .map(PatientMapper::toDto);
     }
 
+    public Optional<PatientResponseDto> findById(UUID id) {
+
+        return patientRepository.findById(id)
+                .map(PatientMapper::toDto);
+    }
 
     public List<PatientResponseDto> findAll() {
-        List<Patient> patientList = patientRepository.findAll();
-
-        return patientList.stream()
+        return patientRepository.findAll()
+                .stream()
                 .map(PatientMapper::toDto)
                 .toList();
+    }
+
+    public Page<PatientResponseDto> findAllPageable(int page, int size, String name) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<Patient> patientPage;
+        if (nonNull(name) && !name.isBlank()) {
+            patientPage = patientRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else {
+            patientPage = patientRepository.findAll(pageable);
+        }
+
+        return patientPage.map(PatientMapper::toDto);
     }
 
     public PatientResponseDto createPatient(PatientRequestDto patientDto) {
