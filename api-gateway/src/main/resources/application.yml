@@ -1,46 +1,13 @@
 ---
+# =============== API-Gateway ==================== #
 server:
   port: 4004  # Gateway listens on port 4004
 
-
 spring:
+#  profiles:
+#    active: local
   output:
     ansi:
       enabled: always
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      server:
-        webflux:
-          routes:
-            # Route for /auth/** auth-service
-            - id: auth-service-route
-              uri: http://auth-service:4005
-              predicates:
-                - Path=/auth/**
-              filters:
-                - StripPrefix=1
-
-            # Route for /api/patients/** to patient-service
-            - id: patient-service-route
-              uri: http://patient-service:4000
-              predicates:
-                - Path=/api/patients/**
-              filters:
-                - StripPrefix=1
-                - JwtValidation
-
-            - id: api-docs-patient-route
-              uri: http://patient-service:4000
-              predicates:
-                - Path=/api-docs/patients
-              filters:
-                - RewritePath=/api-docs/patients,/v3/api-docs
-
-            - id: api-docs-auth-route
-              uri: http://auth-service:4005
-              predicates:
-                - Path=/api-docs/auth
-              filters:
-                - RewritePath=/api-docs/auth,/v3/api-docs

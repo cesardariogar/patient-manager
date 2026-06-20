@@ -1,86 +1,88 @@
 # .gitignore
 
 # ── Compiled Class Files ──
-*.class                        # Java compiled bytecode
+*.class                       
 
 # ── Package Files ──
-*.jar                          # Java Archive
-*.war                          # Web Application Archive
-*.nar                          # Native Archive
-*.ear                          # Enterprise Archive
-*.zip                          # Compressed archives
-*.tar.gz                       # Compressed archives
+*.jar                         
+*.war                         
+*.nar                         
+*.ear                         
+*.zip                         
+*.tar.gz                      
 
 # ── Maven ──
-target/                        # Maven build output directory
-pom.xml.tag                    # Maven release plugin
-pom.xml.releaseBackup          # Maven release plugin backup
-pom.xml.versionsBackup         # Maven versions plugin
-pom.xml.next                   # Maven release plugin
-release.properties             # Maven release properties
-dependency-reduced-pom.xml     # Maven shade plugin
-buildNumber.properties         # Maven build number plugin
-.mvn/timing.properties         # Maven timing data
-.mvn/wrapper/maven-wrapper.jar # Maven wrapper JAR (download on build)
+target/                       
+pom.xml.tag                   
+pom.xml.releaseBackup         
+pom.xml.versionsBackup        
+pom.xml.next                  
+release.properties            
+dependency-reduced-pom.xml    
+buildNumber.properties        
+.mvn/timing.properties        
+.mvn/wrapper/maven-wrapper.jar
 
 # ── Gradle ──
-.gradle/                       # Gradle cache and config
-build/                         # Gradle build output
-!gradle/wrapper/gradle-wrapper.jar   # Keep Gradle wrapper JAR
-!**/src/main/**/build/         # Don't ignore source build dirs
-!**/src/test/**/build/         # Don't ignore test build dirs
+.gradle/                      
+build/                        
+!gradle/wrapper/gradle-wrapper.jar  
+!**/src/main/**/build/        
+!**/src/test/**/build/        
 
 # ── Spring Boot ──
-application-local.properties   # Local Spring config overrides
-application-local.yml          # Local Spring config overrides (YAML)
-*.log                          # Application log files
-logs/                          # Log directory
+application-local.properties  
+application-local.yml         
+*.log                         
+logs/                         
 
 # ── JVM Crash Logs ──
-hs_err_pid*                    # HotSpot error log files
-replay_pid*                    # HotSpot replay files
+hs_err_pid*                   
+replay_pid*                   
 
 # ── IntelliJ IDEA ──
-.idea/                         # IntelliJ project directory
-*.iws                          # IntelliJ workspace
-*.iml                          # IntelliJ module files
-*.ipr                          # IntelliJ project files
-out/                           # IntelliJ build output
+.idea                        
+*.iws                         
+*.iml                         
+*.ipr                         
+out/                          
+!**/src/main/**/out/
+!**/src/test/**/out/
 
 # ── Eclipse ──
-.apt_generated                 # Eclipse annotation processing
-.classpath                     # Eclipse classpath
-.factorypath                   # Eclipse factory path
-.project                       # Eclipse project file
-.settings                     # Eclipse settings directory
-.springBeans                   # Spring IDE beans
-.sts4-cache/                   # Spring Tool Suite cache
-bin/                           # Eclipse build output
+.apt_generated                
+.classpath                    
+.factorypath                  
+.project                      
+.settings                    
+.springBeans                  
+.sts4-cache/                  
+bin/                          
 
 # ── NetBeans ──
-/nbproject/private/            # NetBeans private config
-/nbbuild/                      # NetBeans build
-/nbdist/                       # NetBeans distribution
-/.nb-gradle/                   # NetBeans Gradle plugin
+/nbproject/private/           
+/nbbuild/                     
+/nbdist/                      
+/.nb-gradle/                  
 
 # ── VS Code ──
-.vscode/*                      # VS Code settings
-!.vscode/settings.json         # Keep shared settings
-!.vscode/extensions.json       # Keep extension recommendations
+.vscode/*                     
+!.vscode/settings.json        
+!.vscode/extensions.json      
 
 # ── Environment ──
-.env                           # Environment variables
-.env.local                     # Local environment overrides
-.secrets/                      # Sensible environment variables
-*.pem                          # SSL certificates / private keys
-*.key                          # Private keys
+.env                          
+.env.local                    
+.secrets/                     
+*.pem                         
+*.key                         
 
 # ── OS Files ──
-.DS_Store                      # macOS metadata
-Thumbs.db                      # Windows thumbnails
-*~                             # Backup files
+.DS_Store                     
+Thumbs.db                     
+*~                            
 
 # ── Testing ──
-test-output/                   # TestNG output
-surefire-reports/              # Maven Surefire test reports
-jacoco.exec                    # JaCoCo coverage data
+test-output/                  
+surefire-reports/             
+jacoco.exec                   

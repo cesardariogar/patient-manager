@@ -4,11 +4,12 @@ package com.metalworkshop.PatientService.grpc;
 import billing.BillingRequest;
 import billing.BillingResponse;
 import billing.BillingServiceGrpc;
+import com.metalworkshop.PatientService.config.BillingProperties;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,15 +17,17 @@ public class BillingServiceGrpcClient {
 
     private static final Logger logger = LoggerFactory.getLogger(BillingServiceGrpcClient.class);
     private final billing.BillingServiceGrpc.BillingServiceBlockingStub blockingStub;
+    private String grpcAddress;
+    private int grpcPort;
 
-    // localhost:9001/BillingService/CreateBillingAccount
-    // aws.grpc:1234/BillingService/CreateBillingAccount
-    public BillingServiceGrpcClient(@Value("${billing.service.address:localhost}") String serverAddress,
-                                    @Value("${billing.service.grpc.port:9001}") int serverPort) {
-        logger.info("Connecting to Billing Service GRPC at {}:{}", serverAddress, serverPort);
+    @Autowired
+    public BillingServiceGrpcClient(BillingProperties props) {
+        grpcAddress = props.getGrpcServiceName();
+        grpcPort = props.getGrpcPort();
+        logger.info("Connecting to Billing Service GRPC at {}:{}", grpcAddress, grpcPort);
 
         ManagedChannel channel = ManagedChannelBuilder
-                .forAddress(serverAddress, serverPort)
+                .forAddress(grpcAddress, grpcPort)
                 .usePlaintext()
                 .build();
 

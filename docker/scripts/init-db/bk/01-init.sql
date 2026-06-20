@@ -1,0 +1,23 @@
+-- PATIENT SERVICE DATABASE
+CREATE DATABASE patient_service;
+CREATE USER patient_admin WITH PASSWORD 'REPLACE_PATIENT_PASSWORD';
+ALTER DATABASE patient_service OWNER TO patient_admin;
+
+\connect patient_service;
+
+GRANT ALL PRIVILEGES ON SCHEMA public TO patient_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO patient_admin;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO patient_admin;
+ALTER SCHEMA public OWNER TO patient_admin;
+
+-- AUTH SERVICE DATABASE
+CREATE DATABASE auth_service;
+CREATE USER auth_admin WITH PASSWORD 'REPLACE_AUTH_PASSWORD';
+ALTER DATABASE auth_service OWNER TO auth_admin;
+
+\connect auth_service;
+
+GRANT ALL PRIVILEGES ON SCHEMA public TO auth_admin;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO auth_admin;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO auth_admin;
+ALTER SCHEMA public OWNER TO auth_admin;

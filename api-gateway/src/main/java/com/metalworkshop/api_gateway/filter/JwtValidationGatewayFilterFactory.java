@@ -1,6 +1,8 @@
 package com.metalworkshop.api_gateway.filter;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.metalworkshop.api_gateway.config.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
@@ -12,12 +14,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class JwtValidationGatewayFilterFactory extends
         AbstractGatewayFilterFactory<Object> {
 
-
+    private final Logger logger = LoggerFactory.getLogger(JwtValidationGatewayFilterFactory.class);
     private final WebClient webClient;
 
     public JwtValidationGatewayFilterFactory(WebClient.Builder webClientBuilder,
-                                             @Value("${auth.service.url}") String authServiceUrl) {
-        this.webClient = webClientBuilder.baseUrl(authServiceUrl).build();
+                                             Properties props) {
+        logger.info("Registering auth-service-url: {} in JwtValidationGatewayFilterFactory", props.getAuthAddressUrl());
+        this.webClient = webClientBuilder.baseUrl(props.getAuthAddressUrl()).build();
     }
 
     @Override

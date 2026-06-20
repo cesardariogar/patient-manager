@@ -10,14 +10,13 @@ services:
     image: postgres:18
     container_name: patient-service-db
     environment:
-
+      POSTGRES_DB: postgres
       POSTGRES_USER: admin
-      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASSWORD
-      POSTGRES_DB: default_database
+      POSTGRES_PASSWORD_FILE: /run/secrets/POSTGRES_PASS
     secrets:
-      - POSTGRES_PASSWORD
-      - DB_AUTH_PASSWORD
-      - DB_PATIENT_PASSWORD
+      - POSTGRES_PASS
+      - AUTH_DB_PASS
+      - PATIENT_DB_PASS
     volumes:
       - ./docker/patient-service-db:/var/lib/postgresql/18/data
       - ./docker/scripts/init-db:/docker-entrypoint-initdb.d
@@ -26,7 +25,7 @@ services:
     networks:
       - patient-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin -d default_database"]
+      test: ["CMD-SHELL", "pg_isready -U admin -d postgres"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -48,19 +47,13 @@ services:
     ports:
       - "4005:4005"
     environment:
-      APP_ENV: ${APP_ENV}
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
-      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/auth_database
-      SPRING_DATASOURCE_USERNAME: auth_admin
-      SPRING_DATASOURCE_PASSWORD: "tbd"
-      JWT_SECRET: "tbd"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_SQL_INIT_MODE: always
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     depends_on:
       patient-service-db:
         condition: service_healthy
     volumes:
-      - ./.secrets/db_auth_password.txt:/run/secrets/DB_AUTH_PASSWORD:ro
+      - ./.secrets/auth_db_pass.txt:/run/secrets/AUTH_DB_PASS:ro
       - ./.secrets/jwt_secret.txt:/run/secrets/JWT_SECRET:ro
 
   # api-gateway
@@ -80,10 +73,9 @@ services:
       - "4004:4004"
       - "5006:5006"
     environment:
-      APP_ENV: ${APP_ENV}
-      #JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
-      AUTH_SERVICE_URL: http://auth-service:4005
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      AUTH_SERVICE_URL: ${COMMON_AUTH_SERVICE_URL}
     depends_on:
       - auth-service
       - patient-service
@@ -105,21 +97,18 @@ services:
       - "4000:4000"
       - "5005:5005"
     environment:
-      APP_ENV: ${APP_ENV}
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
-      SPRING_DATASOURCE_URL: jdbc:postgresql://patient-service-db:5432/patient_service
-      SPRING_DATASOURCE_USERNAME: patient_admin
-      SPRING_DATASOURCE_PASSWORD: "tbd"
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: 'http://kafka:9092'
-      SPRING_SQL_INIT_MODE: always
-      BILLING_SERVICE_GRPC_PORT: 9001
-      BILLING_SERVICE_ADDRESS: billing-service
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${COMMON_KAFKA_BOOTSTRAP_SERVERS}
+      BILLING_SERVICE_NAME: ${COMMON_BILLING_SERVICE_NAME}
+      BILLING_SERVICE_GRPC_PORT: ${COMMON_BILLING_SERVICE_GRPC_PORT}
+    env_file:
+      - .env
     depends_on:
       patient-service-db:
         condition: service_healthy
     volumes:
-      - ./.secrets/db_patient_password.txt:/run/secrets/DB_PATIENT_PASSWORD:ro
+      - ./.secrets/patient_db_pass.txt:/run/secrets/PATIENT_DB_PASS:ro
 
   # billing-service
   billing-service:
@@ -138,8 +127,9 @@ services:
       - "4001:4001"
       - "9001:9001"
     environment:
-      APP_ENV: ${APP_ENV}
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      GRPC_SERVER_PORT: ${COMMON_BILLING_SERVICE_GRPC_PORT}
     depends_on:
       - patient-service
 
@@ -159,9 +149,9 @@ services:
     ports:
       - "4002:4002"
     environment:
-      APP_ENV: ${APP_ENV}
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: 'http://kafka:9092'
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: ${COMMON_KAFKA_BOOTSTRAP_SERVERS}
     depends_on:
       - api-gateway
       - kafka
@@ -196,14 +186,17 @@ services:
     networks:
       - patient-network
 
+
 networks:
   patient-network:
     driver: bridge
 
 secrets:
-  POSTGRES_PASSWORD:
-    file: .secrets/postgres_password.txt
-  DB_PATIENT_PASSWORD:
-    file: .secrets/db_patient_password.txt
-  DB_AUTH_PASSWORD:
-    file: .secrets/db_auth_password.txt
+  POSTGRES_PASS:
+    file: .secrets/postgres_pass.txt
+  PATIENT_DB_PASS:
+    file: .secrets/patient_db_pass.txt
+  AUTH_DB_PASS:
+    file: .secrets/auth_db_pass.txt
+  JWT_SECRET:
+    file: .secrets/jwt_secret.txt
