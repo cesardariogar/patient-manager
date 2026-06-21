@@ -1,12 +1,12 @@
 # Build artifacts
 
-target                  # Maven build output
+target                 
 
-build                   # Gradle build output
+build                  
 
-*.jar                   # Standalone JARs (outside target/build)
+*.jar                  
 
-*.class                 # Compiled Java classes
+*.class                
 
 # Version control
 
@@ -30,17 +30,17 @@ docker-compose.yml
 
 # IDE files
 
-.idea                   # IntelliJ IDEA
+.idea                  
 
-*.iml                   # IntelliJ module files
+*.iml                  
 
-.classpath              # Eclipse
+.classpath             
 
-.project                # Eclipse project files
+.project               
 
-.settings               # Eclipse settings
+.settings              
 
-.vscode                 # VS Code settings
+.vscode                
 
 # Logs and temporary files
 
@@ -52,22 +52,22 @@ docker-compose.yml
 
 # Test-related files
 
-src/test                # Test sources (if not needed in image)
+src/test               
 
 test-output
 
 # Local dependency caches
 
-.m2                     # Maven local repository (if mounted)
+.m2                    
 
-.gradle                 # Gradle cache (if mounted)
+.gradle                
 
 # Sensitive files
 
-application.properties  # Config with secrets
+application.properties 
 
-.env                    # Environment variable files
+.env                   
 
-*.key                   # Private keys
+*.key                  
 
-*.pem                   # Certificates
+*.pem                  
