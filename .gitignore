@@ -71,9 +71,13 @@ bin/
 !.vscode/extensions.json      
 
 # ── Environment ──
-.env                          
-.env.local                    
-.secrets/                     
+.env
+*.env
+.env.staging
+.env.production
+.env.local
+!.env.example
+.secrets/
 *.pem                         
 *.key                         
 
