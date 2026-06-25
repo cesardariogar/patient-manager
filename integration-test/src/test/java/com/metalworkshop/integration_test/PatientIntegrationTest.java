@@ -1,6 +1,7 @@
 package com.metalworkshop.integration_test;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -14,6 +15,18 @@ public class PatientIntegrationTest {
 
     static String token;
     static String createdPatientId;
+    JSONObject createJson = new JSONObject("""
+            {
+                "name" : "deleteme",
+                "lastName" : "deleteme",
+                "email" : "deleteme@example.com",
+                "address" : "test subject delete me",
+                "dateOfBirth" : "1977-03-09"
+            }
+            """);
+
+    public PatientIntegrationTest() throws JSONException {
+    }
 
     @BeforeAll
     static void setUp() {
@@ -35,7 +48,6 @@ public class PatientIntegrationTest {
                 .extract()
                 .jsonPath()
                 .get("token");
-
     }
 
     @Order(1)
@@ -99,21 +111,10 @@ public class PatientIntegrationTest {
     @Order(5)
     @Test
     public void shouldCreatePatient() throws JSONException {
-        JSONObject jsonObject = new JSONObject(
-                """
-                        {
-                            "name" : "deleteme",
-                            "lastName" : "deleteme",
-                            "email" : "deleteme@example.com",
-                            "address" : "test subject delete me",
-                            "dateOfBirth" : "1977-03-09"
-                        }
-                        """);
-
         createdPatientId = given()
-                .header("Content-Type", "application/json")
+                .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
-                .body(jsonObject.toString())
+                .body(createJson.toString())
                 .when()
                 .post("/api/patients")
                 .then()
@@ -127,20 +128,14 @@ public class PatientIntegrationTest {
     @Order(6)
     @Test
     public void shouldUpdatePatientFailWithoutMail() throws JSONException {
-        JSONObject jsonObject = new JSONObject(
-                """
-                        {
-                            "name" : "delete.me",
-                            "lastName" : "delete.me",
-                            "address" : "test subject delete me",
-                            "dateOfBirth" : "1977-03-09"
-                        }
-                        """);
+        JSONObject createJsonNoEmail = new JSONObject(createJson.toString());
+        createJsonNoEmail.remove("email");
+
         given()
                 .pathParam("id", "62a28d53-c6d1-4ab0-a0ec-eb7b53613639")
-                .header("Content-Type", "application/json")
+                .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
-                .body(jsonObject.toString())
+                .body(createJsonNoEmail.toString())
                 .when()
                 .put("/api/patients/{id}")
                 .then()
@@ -151,21 +146,15 @@ public class PatientIntegrationTest {
     @Order(7)
     @Test
     public void shouldUpdatePatient() throws JSONException {
-        JSONObject jsonObject = new JSONObject(
-                """
-                        {
-                            "name" : "delete.me",
-                            "lastName" : "delete.me",
-                            "email" : "delete.me@example.com",
-                            "address" : "test subject delete.me",
-                            "dateOfBirth" : "1977-03-09"
-                        }
-                        """);
+        createJson.put("name", "delete.me.updated");
+        createJson.put("lastName", "delete.me.updated");
+        createJson.put("email", "delete.me.updated@test.com");
+
         given()
                 .pathParam("id", createdPatientId)
-                .header("Content-Type", "application/json")
+                .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
-                .body(jsonObject.toString())
+                .body(createJson.toString())
                 .when()
                 .put("/api/patients/{id}")
                 .then()
@@ -177,7 +166,7 @@ public class PatientIntegrationTest {
     public void shouldDeletePatient() throws JSONException {
         given()
                 .pathParam("id", createdPatientId)
-                .header("Content-Type", "application/json")
+                .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .delete("/api/patients/{id}")
@@ -191,7 +180,7 @@ public class PatientIntegrationTest {
         String nonExistingId = "AAABBB-7de2-46d2-9107-222233333";
         given()
                 .pathParam("id", nonExistingId)
-                .header("Content-Type", "application/json")
+                .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
                 .when()
                 .delete("/api/patients/{id}")
