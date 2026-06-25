@@ -1,7 +1,8 @@
 package com.metalworkshop.PatientService.service;
 
-import com.metalworkshop.PatientService.dto.PatientRequestDto;
+import com.metalworkshop.PatientService.dto.PatientCreateRequestDto;
 import com.metalworkshop.PatientService.dto.PatientResponseDto;
+import com.metalworkshop.PatientService.dto.PatientUpdateRequestDto;
 import com.metalworkshop.PatientService.exceptions.EmailAlreadyExistsException;
 import com.metalworkshop.PatientService.exceptions.PatientNotFoundException;
 import com.metalworkshop.PatientService.grpc.BillingServiceGrpcClient;
@@ -74,7 +75,7 @@ public class PatientService {
         return patientPage.map(PatientMapper::toDto);
     }
 
-    public PatientResponseDto createPatient(PatientRequestDto patientDto) {
+    public PatientResponseDto createPatient(PatientCreateRequestDto patientDto) {
         if (patientRepository.existsByEmail(patientDto.getEmail())) {
             throw new EmailAlreadyExistsException(patientDto.getEmail());
         }
@@ -96,7 +97,7 @@ public class PatientService {
         return PatientMapper.toDto(patient);
     }
 
-    public PatientResponseDto updatePatient(UUID uuid, PatientRequestDto requestDto) {
+    public PatientResponseDto updatePatient(UUID uuid, PatientUpdateRequestDto requestDto) {
         Patient patient = patientRepository.findById(uuid).orElseThrow(
                 () -> new PatientNotFoundException("Patient not found with ID: " + id)
         );

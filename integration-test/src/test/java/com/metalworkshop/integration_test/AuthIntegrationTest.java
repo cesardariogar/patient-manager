@@ -25,7 +25,7 @@ public class AuthIntegrationTest {
                     "password": "password123"
                 }
                 """;
-        Response response = given()
+        given()
                 .contentType("application/json")
                 .body(loginPayload)
                 .when()
@@ -35,8 +35,6 @@ public class AuthIntegrationTest {
                 .body("token", notNullValue())
                 .extract()
                 .response();
-
-        System.out.println("Generated Token: " + response.jsonPath().getString("token"));
     }
 
     @Test
@@ -48,12 +46,12 @@ public class AuthIntegrationTest {
                 }
                 """;
         given()
-            .contentType("application/json")
-            .body(loginPayload)
-            .when()
-            .post("/auth/login")
-            .then()
-            .statusCode(401);
+                .contentType("application/json")
+                .body(loginPayload)
+                .when()
+                .post("/auth/login")
+                .then()
+                .statusCode(401);
     }
 
 }

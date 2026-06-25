@@ -1,6 +1,6 @@
 package com.metalworkshop.PatientService.mappers;
 
-import com.metalworkshop.PatientService.dto.PatientRequestDto;
+import com.metalworkshop.PatientService.dto.PatientCreateRequestDto;
 import com.metalworkshop.PatientService.model.Patient;
 import com.metalworkshop.PatientService.dto.PatientResponseDto;
 import org.slf4j.Logger;
@@ -31,18 +31,18 @@ public class PatientMapper {
         return patientResponseDto;
     }
 
-    public static Patient toEntity(PatientRequestDto patientRequestDto) {
+    public static Patient toEntity(PatientCreateRequestDto patientCreateRequestDto) {
         Patient newPatient = new Patient();
         try {
-            newPatient.setName(patientRequestDto.getName());
-            newPatient.setLastName(patientRequestDto.getLastName());
-            newPatient.setEmail(patientRequestDto.getEmail());
-            newPatient.setAddress(patientRequestDto.getAddress());
-            newPatient.setDateOfBirth(LocalDate.parse(patientRequestDto.getDateOfBirth()));
+            newPatient.setName(patientCreateRequestDto.getName());
+            newPatient.setLastName(patientCreateRequestDto.getLastName());
+            newPatient.setEmail(patientCreateRequestDto.getEmail());
+            newPatient.setAddress(patientCreateRequestDto.getAddress());
+            newPatient.setDateOfBirth(LocalDate.parse(patientCreateRequestDto.getDateOfBirth()));
             // id
             // registeredDate
         } catch (Exception ex) {
-            logger.info("Error, could not parse the PatientRequestDto:\n{}", patientRequestDto.toString());
+            logger.info("Error, could not parse the PatientRequestDto:\n{}", patientCreateRequestDto.toString());
             throw ex;
         }
 
