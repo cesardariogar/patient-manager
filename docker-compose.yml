@@ -1,14 +1,14 @@
 services:
 
-  # patient-service-db
-  patient-service-db:
+  # patient-manager-postgres
+  patient-manager-postgres:
     deploy:
       resources:
         limits:
           cpus: "0.40"
           memory: 600m
     image: postgres:18
-    container_name: patient-service-db
+    container_name: patient-manager-postgres
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: admin
@@ -18,7 +18,7 @@ services:
       - AUTH_DB_PASS
       - PATIENT_DB_PASS
     volumes:
-      - ./docker/patient-service-db:/var/lib/postgresql/18/data
+      - ./docker/patient-manager-postgres:/var/lib/postgresql/18/data
       - ./docker/scripts/init-db:/docker-entrypoint-initdb.d
     ports:
       - "5432:5432"
@@ -50,7 +50,7 @@ services:
       JAVA_TOOL_OPTIONS: -Xms128m -Xmx256m
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     depends_on:
-      patient-service-db:
+      patient-manager-postgres:
         condition: service_healthy
     volumes:
       - ./.secrets/auth_db_pass.txt:/run/secrets/AUTH_DB_PASS:ro
@@ -105,7 +105,7 @@ services:
     env_file:
       - .env
     depends_on:
-      patient-service-db:
+      patient-manager-postgres:
         condition: service_healthy
     volumes:
       - ./.secrets/patient_db_pass.txt:/run/secrets/PATIENT_DB_PASS:ro
