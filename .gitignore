@@ -89,4 +89,7 @@ Thumbs.db
 # ── Testing ──
 test-output/                  
 surefire-reports/             
-jacoco.exec                   
+jacoco.exec
+
+# ── Infrasstructure ──
+cdk.out/**
