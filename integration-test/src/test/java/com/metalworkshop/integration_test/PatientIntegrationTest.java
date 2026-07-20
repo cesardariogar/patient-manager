@@ -48,6 +48,25 @@ public class PatientIntegrationTest {
                 .extract()
                 .jsonPath()
                 .get("token");
+
+        java.util.List<String> ids = given()
+                .header("Authorization", "Bearer " + token)
+                .when()
+                .get("/api/patients?name=delete")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getList("content.id", String.class);
+
+        for (String id : ids) {
+            given()
+                    .header("Authorization", "Bearer " + token)
+                    .when()
+                    .delete("/api/patients/" + id)
+                    .then()
+                    .statusCode(204);
+        }
     }
 
     @Order(1)
@@ -110,7 +129,7 @@ public class PatientIntegrationTest {
 
     @Order(5)
     @Test
-    public void shouldCreatePatient() throws JSONException {
+    public void shouldCreatePatient() {
         createdPatientId = given()
                 .contentType(ContentType.JSON)
                 .header("Authorization", "Bearer " + token)
@@ -163,7 +182,7 @@ public class PatientIntegrationTest {
 
     @Order(8)
     @Test
-    public void shouldDeletePatient() throws JSONException {
+    public void shouldDeletePatient() {
         given()
                 .pathParam("id", createdPatientId)
                 .contentType(ContentType.JSON)
@@ -176,7 +195,7 @@ public class PatientIntegrationTest {
 
     @Order(9)
     @Test
-    public void shouldFailDeletingPatientIdNotFound() throws JSONException {
+    public void shouldFailDeletingPatientIdNotFound() {
         String nonExistingId = "AAABBB-7de2-46d2-9107-222233333";
         given()
                 .pathParam("id", nonExistingId)
